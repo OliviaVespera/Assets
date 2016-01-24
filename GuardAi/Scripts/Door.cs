@@ -7,6 +7,7 @@ public class Door : MonoBehaviour {
     Animator anim;
     public NavMeshObstacle doorObstacle;
     public BoxCollider col;
+    public bool locked = false;
 
 	// Use this for initialization
 	void Start () {
@@ -42,8 +43,28 @@ public class Door : MonoBehaviour {
 
     public void DoorAction()
     {
-        //float fDist = Vector3.Distance(transform.position, pl.transform.position);
-        if (anim.GetBool ("Open") == true)
+        if (locked == true)
+        {
+            if (pl.getInventory(0)>0)
+            {
+                DoorAnim();
+            }
+
+            else
+            {
+                Debug.Log("Insufficient keys");
+            }
+        }
+
+        else
+        {
+            DoorAnim();
+        }
+    }
+
+    public void DoorAnim()
+    {
+        if (anim.GetBool("Open") == true)
         {
             doorObstacle.enabled = true;
             anim.SetBool("Open", false);

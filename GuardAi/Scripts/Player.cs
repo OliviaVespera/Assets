@@ -8,13 +8,16 @@ public class Player : MonoBehaviour {
 	int keysAvailable = 0;
     int tripItem = 0;
     int assistItem = 0;
+    int endKey = 0;
     float fDist = 0;
     public Transform target;
     public GameObject tripObject;
     public GameObject assistObject;
     NavMeshAgent agent;
 	Vector3 mousePos;
+    public EventLevel1 talk;
     public Animator anim;
+    public LayerMask mask = 9;
 
 	// Use this for initialization
 	void Start () {
@@ -22,9 +25,12 @@ public class Player : MonoBehaviour {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
 
-		//GameObject entrance = GameObject.FindGameObjectWithTag ("Entrance");
-		//transform.position = entrance.transform.position;
-	}
+		GameObject entrance = GameObject.FindGameObjectWithTag ("Entrance");
+		transform.position = entrance.transform.position;
+
+        GameObject talked = GameObject.FindGameObjectWithTag("Event");
+        talk = talked.GetComponent<EventLevel1>();
+    }
 	// Update is called once per frame
 	void Update () {
         transform.rotation = (Quaternion.Euler(270.0f, 180.0f, 0.0f));
@@ -34,7 +40,7 @@ public class Player : MonoBehaviour {
 
         RaycastHit hit;
         Debug.DrawLine(transform.position, mousePos);
-        if (Physics.Linecast(transform.position, mousePos, out hit))
+        if (Physics.Linecast(transform.position, mousePos, out hit, mask))
         {
             fDist = Vector3.Distance(transform.position, mousePos);
             if (hit.collider.CompareTag("Door") && fDist < 2.5 && Input.GetMouseButtonUp(0))
@@ -45,10 +51,37 @@ public class Player : MonoBehaviour {
                 newDoor2.DoorAction();
             }
 
+            else if (hit.collider.CompareTag("Chest") && fDist < 2.5 && Input.GetMouseButtonUp(0))
+            {
+                //Chest
+                GameObject newChest = hit.transform.gameObject;
+                Chests newChest2 = newChest.GetComponent<Chests>();
+                newChest2.Opened();
+            }
+
             //else if (hit.collider.CompareTag("Furniture"))
             //{
-            //    //examine furniture
+
             //}
+
+            else if (hit.collider.CompareTag("Aerith") && fDist < 2.5 && Input.GetMouseButtonUp(0))
+            {
+                talk.amtTalked++;
+            }
+
+            else if (hit.collider.CompareTag("End") && fDist < 2.5 && Input.GetMouseButtonUp(0))
+            {
+                if (endKey > 0)
+                {
+                    endKey = 0;
+                    Debug.Log("Completed Level");
+                }
+
+                else
+                {
+                    Debug.Log("Insufficient keys");
+                }
+            }
         }
 
         else if (Input.GetMouseButtonUp(0))
@@ -108,6 +141,13 @@ public class Player : MonoBehaviour {
             assistItem++;
             Debug.Log("Assist item available: " + assistItem);
         }
+
+        else if (other.CompareTag("EndKey"))
+        {
+            Destroy(other.gameObject);
+            endKey++;
+            Debug.Log("End key available: " + endKey);
+        }
     }
 
 	public void editInventory(int itemType ,int amt)
@@ -129,6 +169,12 @@ public class Player : MonoBehaviour {
             assistItem += amt;
             Debug.Log("Assist items available: " + assistItem);
         }
+
+        else if (itemType == 3)
+        {
+            endKey += amt;
+            Debug.Log("End keys available: " + endKey);
+        }
     }
 
 	public int getInventory(int itemType)
@@ -149,6 +195,12 @@ public class Player : MonoBehaviour {
         {
             Debug.Log("Assist items available: " + assistItem);
             return assistItem;
+        }
+
+        else if (itemType == 3)
+        {
+            Debug.Log("End keys available: " + endKey);
+            return endKey;
         }
 
         return 0;
