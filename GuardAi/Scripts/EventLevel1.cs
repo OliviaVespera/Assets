@@ -11,6 +11,8 @@ public class EventLevel1 : MonoBehaviour {
     public int amtTalked = 0;
     public GameObject ghosto;
     public Transform ghostSpawn;
+    public Light main;
+    public GameObject[] subs;
 
 	// Use this for initialization
 	void Start () {
@@ -33,6 +35,11 @@ public class EventLevel1 : MonoBehaviour {
         if (amtTalked == talkReq)
         {
             Debug.Log("Ghost has spawned");
+            main.enabled = false;
+            for (int i = 0; i<subs.Length; i++)
+            {
+                subs[i].SetActive(true);
+            }
             Instantiate(ghosto, ghostSpawn.position, Quaternion.Euler(90, 0, 0));
             amtTalked++;
         }

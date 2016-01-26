@@ -33,7 +33,7 @@ public class Player : MonoBehaviour {
     }
 	// Update is called once per frame
 	void Update () {
-        transform.rotation = (Quaternion.Euler(270.0f, 180.0f, 0.0f));
+        transform.rotation = (Quaternion.Euler(90.0f, 0.0f, 0.0f));
 		mousePos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 
         mousePos = new Vector3(mousePos.x, 0.18f, mousePos.z);
